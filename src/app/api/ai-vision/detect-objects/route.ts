@@ -1,5 +1,4 @@
 import { HfInference } from '@huggingface/inference'
-import { readFileSync } from 'fs'
 
 const hf = new HfInference(process.env.HUGGINGFACE_API_KEY)
 

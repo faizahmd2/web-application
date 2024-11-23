@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { Loader2, Type, Wand2 } from "lucide-react"
 
 export default function FillMask() {
@@ -12,7 +13,7 @@ export default function FillMask() {
   const [suggestions, setSuggestions] = useState<any[]>([])
   const [completeSentences, setCompleteSentences] = useState<string[]>([])
 
-  const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value)
     setSuggestions([])
     setCompleteSentences([])
@@ -61,12 +62,19 @@ export default function FillMask() {
       <CardContent className="pt-6 space-y-6">
         <div className="space-y-4">
           <div className="flex gap-2">
-            <Input
+            {/* <Input
               value={text}
               onChange={handleTextChange}
               placeholder="Enter text with [MASK] token..."
               className="flex-1 border-2 focus:border-purple-400 transition-colors"
-            />
+            /> */}
+            <Textarea
+              value={text}
+              className="flex-1 border-2 focus:border-purple-400 transition-colors" 
+              placeholder="Type your message here." 
+              onChange={handleTextChange}   />
+          </div>
+          <div className='text-center'>
             <Button 
               onClick={insertMask}
               variant="outline"
