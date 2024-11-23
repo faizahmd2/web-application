@@ -1,0 +1,3 @@
+# Redirects from what the browser requests to what we serve
+/portfolio /static-site/portfolio/index.html
+/web-video-player /static-site/web-video-player/index.html
