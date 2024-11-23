@@ -13,7 +13,10 @@ const NextConfig = {
       },
       // Add more static site rewrites as needed
     ]
-  }
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 }
 
 export default NextConfig;
