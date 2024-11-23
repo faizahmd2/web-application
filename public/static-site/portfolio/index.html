@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Profile Page</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #7f7fd5, #86a8e7, #91eae4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+        }
+        .cloud {
+            position: absolute;
+            width: 320px; height: 120px;
+            background: #f2f9fe;
+            background: linear-gradient(top, #f2f9fe 5%, #d6f0fd 100%);
+            background: -webkit-linear-gradient(top, #f2f9fe 5%, #d6f0fd 100%);
+            background: -moz-linear-gradient(top, #f2f9fe 5%, #d6f0fd 100%);
+            background: -ms-linear-gradient(top, #f2f9fe 5%, #d6f0fd 100%);
+            background: -o-linear-gradient(top, #f2f9fe 5%, #d6f0fd 100%);
+            border-radius: 100px;
+            -webkit-border-radius: 100px;
+            -moz-border-radius: 100px;
+            animation: moveClouds 60s linear infinite;
+            z-index: 0;
+        }
+
+        .cloud:after, .cloud:before {
+            content: '';
+            position: absolute;
+            background: #f2f9fe;
+            z-index: -1
+        }
+
+        .cloud:after {
+            width: 100px; height: 100px;
+            top: -50px; left: 50px;
+            
+            border-radius: 100px;
+            -webkit-border-radius: 100px;
+            -moz-border-radius: 100px;
+        }
+
+        .cloud:before {
+            width: 180px; height: 180px;
+            top: -90px; right: 50px;
+            border-radius: 200px;
+            -webkit-border-radius: 200px;
+            -moz-border-radius: 200px;
+        }
+
+        @keyframes moveClouds {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+
+        /* Bird Animation */
+        .bird {
+            position: absolute;
+            font-size: 24px;
+            color: #333;
+            animation: flyBirds 60s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes flyBirds {
+            0% { transform: translateX(-150%) translateY(-50%) rotate(0deg); }
+            50% { transform: translateX(0%) translateY(0%) rotate(0deg); }
+            100% { transform: translateX(150%) translateY(50%) rotate(0deg); }
+        }
+        .container {
+            position: relative;
+            text-align: center;
+            padding: 20px;
+            border-radius: 15px;
+            background: #fff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 90%;
+            margin: 20px;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+        .profile-pic {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid #fff;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s;
+        }
+        .profile-pic:hover {
+            transform: scale(1.1);
+        }
+        h1 {
+            margin: 15px 0;
+            font-size: 2.5em;
+            animation: slideIn 1s ease-out;
+        }
+        p {
+            font-size: 1.2em;
+            animation: slideUp 1s ease-out;
+        }
+        .bio-points {
+            list-style-type: none;
+            padding: 0;
+            margin: 15px 0;
+        }
+        .bio-points li {
+            margin: 10px 0;
+            font-size: 1em;
+            animation: slideUp 1.5s ease-out;
+        }
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+        .tab {
+            background: #7f7fd5;
+            color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .tab:hover {
+            background: #575fcf;
+        }
+        .tab-content {
+            display: none;
+            margin-top: 20px;
+            text-align: left;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .experience, .visibility {
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.5s ease;
+        }
+        .modal-content {
+            background-color: #fff;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.5s ease;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            .tab {
+                margin: 10px 0;
+            }
+        }
+
+        .decoration-none {
+            text-decoration: none;
+        }
+        
+    </style>
+    <script>
+        function closeModal() {document.getElementById('myModal').style.display = 'none'}
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const tabs = document.querySelectorAll('.tab');
+            const modal = document.getElementById('myModal');
+            const modalContent = document.querySelector('.modal-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function () {
+                    const contentId = this.getAttribute('data-content');
+                    const content = document.getElementById(contentId).innerHTML;
+                    modalContent.innerHTML = `<span class="close" onclick="closeModal()">&times;</span>${content}`;
+                    modal.style.display = 'flex';
+                });
+            });
+
+            window.addEventListener('click', function (event) {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <!-- Effect -->
+    <div class="cloud" style="top: 25%; left: 10%;"></div>
+    <div class="cloud" style="top: 30%; right: 15%;"></div>
+    <!-- <div class="cloud" style="bottom: 20%; left: 50%;"></div> -->
+
+    <div class="bird" style="top: 10%; left: 20%;">&#9992;</div>	
+    <div class="bird" style="top: 30%; right: 15%;">&#9992;</div>
+    <!-- <div class="bird" style="bottom: 20%; left: 70%;">&#9992;</div> -->
+
+    <div class="container">
+        <img class="profile-pic" src="https://i.ibb.co/z7y3bWW/Whats-App-Image-2024-08-03-at-00-14-34.jpg" alt="Profile Picture" border="0">
+        <h1>Faiz Ahmad</h1>
+        <p>Hello! I'm Faiz, a passionate programmer and developer.</p>
+        <ul class="bio-points">
+            <li>🎨 Loves Programming</li>
+            <li>💻 Enjoys coding in JavaScript</li>
+            <li>🌍 Avid traveler</li>
+            <li>🎯 Darts beginner</li>
+        </ul>
+        <div class="tabs">
+            <div class="tab" data-content="experienceContent">Experience</div>
+            <div class="tab" data-content="projectsContent">Projects</div>
+            <div class="tab" data-content="visibilityContent">Public Visibility</div>
+        </div>
+    </div>
+    
+    <!-- Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+        </div>
+    </div>
+
+    <!-- Content for modal -->
+    <div id="experienceContent" style="display: none;">
+        <h2>Experience:</h2>
+        <ul class="bio-points">
+            <li>3 years of experience in fullstack development</li>
+            <li>Backend development with Node.js</li>
+            <li>Frontend development with Angular and AngularJS</li>
+            <li>Worked on various projects including big file upload server and client, a fully authenticated user signup/login system, and more.</li>
+        </ul>
+    </div>
+    <div id="projectsContent" style="display: none;">
+        <h2>Projects:</h2>
+        <ul class="bio-points">
+            <li>AI Vision Tools: <a href="/ai-vision" target="_blank" class="decoration-none">visit ↗</a></li>
+            <li>Make Notes and Share: <a href="https://notespot.site" target="_blank" class="decoration-none">visit ↗</a></li>
+            <li>Simple Chat App: <a href="https://chat-app-faiz.netlify.app" target="_blank" class="decoration-none">visit ↗</a></li>
+            <li>Word definitions: <a href="https://faizahmd2.github.io/fun" target="_blank" class="decoration-none">visit ↗</a></li>
+            <li>Loaders and code snippet: <a href="https://faizahmd2.github.io/simple-loader-collections" target="_blank" class="decoration-none">visit ↗</a></li>
+            <li>Upload large files: <a href="https://github.com/faizahmd2/upload-large-file" target="_blank" class="decoration-none">See code ↗</a></li>
+        </ul>
+    </div>
+    <div id="visibilityContent" style="display: none;">
+        <h2>Public Visibility:</h2>
+        <ul class="bio-points">
+            <li>GitHub: <a href="https://github.com/faizahmd2" target="_blank">github.com/faizahmd2</a></li>
+            <li>LinkedIn: <a href="https://linkedin.com/in/ifaiz2" target="_blank">linkedin.com/in/ifaiz2</a></li>
+            <li>Twitter: <a href="https://x.com/ifaiz2" target="_blank">x.com/ifaiz2</a></li>
+        </ul>
+    </div>
+</body>
+</html>
