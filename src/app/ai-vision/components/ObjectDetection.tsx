@@ -28,7 +28,7 @@ export default function ObjectDetection() {
     
     setLoading(true)
     try {
-      const response = await fetch('/api/ai-visoon/detect-objects', {
+      const response = await fetch('/api/ai-vision/detect-objects', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image })

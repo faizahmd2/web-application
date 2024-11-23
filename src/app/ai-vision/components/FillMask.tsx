@@ -27,7 +27,7 @@ export default function FillMask() {
     
     setLoading(true)
     try {
-      const response = await fetch('/api/ai-visoon/fill-mask', {
+      const response = await fetch('/api/ai-vision/fill-mask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text })

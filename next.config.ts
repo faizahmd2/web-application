@@ -1,10 +1,6 @@
 import type { NextConfig } from "next";
 
 const NextConfig = {
-  // Enable static HTML export for routes that need it
-  output: process.env.NODE_ENV !== "development" ? "export" : "standalone",
-  
-  // Rewrite static HTML pages
   async rewrites() {
     return [
       {
