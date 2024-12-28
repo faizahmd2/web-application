@@ -34,7 +34,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      imageUrl: urlObj.origin + "/image/"+imageId,
+      imageUrl: urlObj.origin + "/image-app/"+imageId,
     });
   } catch (error) {
     console.log("UPLOAD CATCH ERROR:",error);

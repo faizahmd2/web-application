@@ -41,7 +41,7 @@ const ImageDownloadPage = () => {
       });
 
       const timer = setTimeout(() => {
-        window.location.href = `/api/image/${key}`;
+        window.location.href = `/api/image-app/${key}`;
       }, 100);
 
       return () => clearTimeout(timer);

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useInView } from 'react-intersection-observer';
 import { Search, Download, Share2, Upload } from 'lucide-react';
@@ -243,4 +243,10 @@ const GalleryPage = () => {
   );
 };
 
-export default GalleryPage;
+export default function Gallery() {
+  return (
+    <Suspense>
+      <GalleryPage />
+    </Suspense>
+  )
+}
