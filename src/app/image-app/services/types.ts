@@ -9,9 +9,12 @@ export interface UnsplashImage {
     };
     alt_description: string;
     description: string;
-    user: {
-      name: string;
-      username: string;
-    };
-    likes: number;
+}
+
+export interface Image {
+  _id: string;
+  user: string | null;
+  imageId: string;
+  tags: string[];
+  uploadDate: Date;
 }

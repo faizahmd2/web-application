@@ -3,18 +3,33 @@
 import { useState, useEffect } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useInView } from 'react-intersection-observer';
-import { Search, Heart, Download, Share2, Upload } from 'lucide-react';
+import { Search, Download, Share2, Upload } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { UnsplashImage } from './services/types';
 import UploadModal from './components/uploadModal';
 import ImageModal from './components/ImageModal';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 const GalleryPage = () => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isImageModalOpen, setIsImageModalOpen] = useState<UnsplashImage | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const { ref, inView } = useInView();
+  const [showUploaded, setShowUploaded] = useState(searchParams.get('showUpload') === "true");
+
+  const addQueryParam = (q: string, v: string) => {
+    const params = new URLSearchParams(searchParams?.toString());
+
+    params.set(q, v);
+
+    router.push(`${pathname}?${params.toString()}`);
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -36,6 +51,11 @@ const GalleryPage = () => {
     setIsImageModalOpen(null);
   };
 
+  const handleUploadToggle = (checked: boolean) => {
+    addQueryParam("showUpload", checked.toString());
+    setShowUploaded(checked);
+  };
+
   const {
     data,
     fetchNextPage,
@@ -44,10 +64,11 @@ const GalleryPage = () => {
     isError,
     error
   } = useInfiniteQuery({
-    queryKey: ['images', debouncedQuery],
+    queryKey: ['images', debouncedQuery, showUploaded],
     queryFn: async ({ pageParam = 1 }) => {
       const params = new URLSearchParams({
         page: pageParam.toString(),
+        showUpload: showUploaded.toString(),
         ...(debouncedQuery && { query: debouncedQuery })
       });
       
@@ -104,6 +125,20 @@ const GalleryPage = () => {
             />
             <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           </div>
+          <div className="flex items-center space-x-2 mt-3">
+            <Checkbox 
+              id="uploaded"
+              checked={showUploaded}
+              onCheckedChange={handleUploadToggle}
+              className="h-4 w-4"
+            />
+            <Label 
+              htmlFor="uploaded"
+              className="text-sm text-gray-700 cursor-pointer"
+            >
+              Show only uploaded images
+            </Label>
+          </div>
           <>
             <button
               onClick={() => setIsUploadModalOpen(true)}
@@ -153,7 +188,7 @@ const GalleryPage = () => {
                 <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-opacity duration-300">
                   <div className="absolute bottom-0 left-0 right-0 p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
                     <div className="flex justify-between items-center text-white">
-                      <div className="text-sm">{image.user.name}</div>
+                      <div className="text-sm">{image.alt_description}</div>
                       <div className="flex space-x-3">
                         {/* <button
                           onClick={() => handleLike(image.id)}

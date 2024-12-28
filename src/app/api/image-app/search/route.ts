@@ -8,6 +8,8 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const query = searchParams.get('query');
     const page = parseInt(searchParams.get('page') || '1');
+    const showUpload = searchParams.get('showUpload') || "false";
+    const user = searchParams.get('user');
     
     if (!query) {
       return NextResponse.json(
@@ -19,7 +21,7 @@ export async function GET(request: Request) {
     // Get client IP from headers
     const ip = request.headers.get('x-forwarded-for') || 'unknown-ip';
     
-    const images = await client.searchImages(query, page, ip);
+    const images = await client.searchImages(query, page, ip, user, showUpload);
     
     return NextResponse.json(images);
   } catch (error: any) {
