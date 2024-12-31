@@ -5,11 +5,12 @@ const client = new UnsplashClient();
 
 export async function GET(request: Request) {
   try {
-    const { searchParams } = new URL(request.url);
+    const url = new URL(request.url, `http://localhost`);
+    const searchParams = new URLSearchParams(url.search);
+    const page = parseInt(searchParams.get('page') || '1', 10);
+    const showUpload = searchParams.get('showUpload') === "true";
+    const user = searchParams.get('user') || null;
     const query = searchParams.get('query');
-    const page = parseInt(searchParams.get('page') || '1');
-    const showUpload = searchParams.get('showUpload') || "false";
-    const user = searchParams.get('user');
     
     if (!query) {
       return NextResponse.json(

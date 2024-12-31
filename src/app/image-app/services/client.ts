@@ -15,7 +15,7 @@ export class UnsplashClient {
     });
   }
 
-  async searchImages(search: string, page: number = 1, ip: string, userId: string | null, showUpload: string): Promise<UnsplashImage[]> {
+  async searchImages(search: string, page: number = 1, ip: string, userId: string | null, showUpload: boolean): Promise<UnsplashImage[]> {
     const cacheKey = `search:${search}:${page}`;
     
     // Check rate limit
@@ -28,7 +28,7 @@ export class UnsplashClient {
     // if (cached) return cached;
 
     let images;
-    if(showUpload === 'true') {
+    if(showUpload) {
       const query: any = {};
       if (userId) {
         query.userId = userId;
