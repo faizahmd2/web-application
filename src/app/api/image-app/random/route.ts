@@ -5,10 +5,11 @@ const client = new UnsplashClient();
 
 export async function GET(request: Request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const showUpload = searchParams.get('showUpload') || "false";
-    const user = searchParams.get('user');
+    const url = new URL(request.url, `http://localhost`);
+    const searchParams = new URLSearchParams(url.search);
+    const page = parseInt(searchParams.get('page') || '1', 10);
+    const showUpload = searchParams.get('showUpload') === "true";
+    const user = searchParams.get('user') || null;
     
     // Get client IP from headers
     const ip = request.headers.get('x-forwarded-for') || 'unknown-ip';

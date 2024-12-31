@@ -76,7 +76,7 @@ export class UnsplashClient {
     return images;
   }
 
-  async getRandomImages(count: number = 10, ip: string, userId: string | null, showUpload: string, page: number): Promise<UnsplashImage[]> {
+  async getRandomImages(count: number = 10, ip: string, userId: string | null, showUpload: boolean, page: number): Promise<UnsplashImage[]> {
     const cacheKey = `random:${count}:${new Date().toISOString().split('T')[0]}`;
     
     // if (!await checkRateLimit(ip)) {
@@ -88,7 +88,7 @@ export class UnsplashClient {
 
     
     let images;
-    if(showUpload === 'true') {
+    if(showUpload) {
       const query: any = {};
       if (userId) {
         query.userId = userId;
