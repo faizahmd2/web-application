@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+// import { useParams } from 'next/navigation';
 import { format } from 'date-fns';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CookieUser, Post } from '@/lib/blog-app/types';
@@ -10,22 +10,28 @@ import SkeletonLoader from '../../components/skeleton';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
-const BlogPost = () => {
-  const params = useParams();
+interface PageProps {
+  params: {
+    postId: string;
+  };
+}
+
+const BlogPost: React.FC<PageProps> = ({ params }) => {
+  const postId = params.postId;
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchPost = async () => {
-      if (!params.postId) {
+      if (!postId) {
         setError('Post ID is required');
         setLoading(false);
         return;
       }
 
       try {
-        const res = await fetch(`/api/blog-app/posts/${params.postId}`, {
+        const res = await fetch(`/api/blog-app/posts/${postId}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
         });
@@ -44,7 +50,7 @@ const BlogPost = () => {
     };
 
     fetchPost();
-  }, [params.postId]);
+  }, [postId]);
 
   if (loading) {
     return <SkeletonLoader />;
