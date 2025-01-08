@@ -71,7 +71,7 @@ const EditorPage = () => {
       <div className="flex-1">
         <Editor
           height="100%"
-          defaultLanguage="javascript"
+          defaultLanguage="text"
           value={content}
           theme="vs-dark"
           loading="Loading..."
