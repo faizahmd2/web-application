@@ -1,17 +1,39 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Editor } from '@monaco-editor/react';
-import { ChevronDown, Download, Settings } from 'lucide-react';
+import { ChevronDown, Download, Sun, Moon, Menu, X, Languages, ZoomIn, ZoomOut } from 'lucide-react';
 
 const EditorPage = () => {
   const [content, setContent] = useState('');
+  const [isDark, setIsDark] = useState(true);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [filename, setFilename] = useState('document');
+  const [selectedLanguage, setSelectedLanguage] = useState('text');
+  const dropdownRef = useRef<any | null>(null);
+  const [fontSize, setFontSize] = useState(16);
+
+  const handleZoomIn = () => {
+    setFontSize(prev => Math.min(prev + 4, 32)); // Max font size 24
+  };
+
+  const handleZoomOut = () => {
+    setFontSize(prev => Math.max(prev - 4, 8)); // Min font size 10
+  };
+
+  const languages = [
+    { value: 'javascript', label: 'JavaScript' },
+    { value: 'typescript', label: 'TypeScript' },
+    { value: 'html', label: 'HTML' },
+    { value: 'css', label: 'CSS' },
+    { value: 'json', label: 'JSON' },
+    { value: 'markdown', label: 'Markdown' },
+    { value: 'text', label: 'Plain Text' },
+  ];
 
   const fileTypes = [
     { extension: 'txt', label: 'Text File (.txt)' },
     { extension: 'js', label: 'JavaScript (.js)' },
-    { extension: 'sql', label: 'SQL (.sql)' },
     { extension: 'json', label: 'JSON (.json)' },
     { extension: 'md', label: 'Markdown (.md)' },
     { extension: 'html', label: 'HTML (.html)' },
@@ -21,12 +43,12 @@ const EditorPage = () => {
     setContent(value || '');
   };
 
-  const downloadFile = (extension:string) => {
+  const downloadFile = (extension: string) => {
     const blob = new Blob([content], { type: 'text/plain' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `document.${extension}`;
+    a.download = `${filename}.${extension}`;
     document.body.appendChild(a);
     a.click();
     window.URL.revokeObjectURL(url);
@@ -34,14 +56,26 @@ const EditorPage = () => {
     setIsDropdownOpen(false);
   };
 
-  return (
-    <div className="h-screen w-screen flex flex-col bg-gray-900">
-      {/* Toolbar */}
-      <div className="bg-gray-800 p-2 flex items-center justify-between">
-        <div className="text-white font-medium">Editor</div>
+  const toggleTheme = () => {
+    setIsDark(!isDark);
+  };
+
+  const DesktopControls = () => (
+    <>
+      <div className="flex items-center gap-2">
+        <select
+          value={selectedLanguage}
+          onChange={(e) => setSelectedLanguage(e.target.value)}
+          className="hidden sm:inline x-2 py-1.5 bg-gray-700 rounded-md text-white hover:bg-gray-600 transition-colors"
+        >
+          {languages.map((lang) => (
+            <option key={lang.value} value={lang.value}>
+              {lang.label}
+            </option>
+          ))}
+        </select>
         
-        {/* Download dropdown */}
-        <div className="relative">
+        <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className="flex items-center gap-2 px-3 py-1.5 bg-gray-700 rounded-md text-white hover:bg-gray-600 transition-colors"
@@ -66,20 +100,71 @@ const EditorPage = () => {
           )}
         </div>
       </div>
+    </>
+  );
 
-      {/* Editor container */}
-      <div className="flex-1">
+  const ZoomComp = () => (<div className="hidden md:flex px-4 py-2 flex justify-center gap-4">
+    <button
+      onClick={handleZoomOut}
+      className="p-1.5 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200"
+    >
+      <ZoomOut size={16} />
+    </button>
+    <button
+      onClick={handleZoomIn}
+      className="p-1.5 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200"
+    >
+      <ZoomIn size={16} />
+    </button>
+  </div>)
+
+  return (
+    <div className={`h-screen flex flex-col overflow-hidden ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
+      <div className={`p-2 flex items-center justify-between gap-2 ${isDark ? 'bg-gray-800' : 'bg-white border-b'}`}>
+        <div className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
+          <input
+            type="text"
+            value={filename}
+            onChange={(e) => setFilename(e.target.value)}
+            placeholder="Filename"
+            className={`px-2 py-1 rounded-md ${
+              isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-900'
+            } text-sm focus:outline-none focus:ring-1 focus:ring-blue-500`}
+          />
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <ZoomComp />
+          <button
+            onClick={toggleTheme}
+            className={`p-1.5 rounded-md transition-colors ${
+              isDark ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+            }`}
+          >
+            {isDark ? <Sun size={16} /> : <Moon size={16} />}
+          </button>
+          
+          <DesktopControls />
+        </div>
+      </div>
+
+      <div className="flex-1 relative">
         <Editor
-          height="100%"
+          height="90vh"
           defaultLanguage="text"
+          language={selectedLanguage}
           value={content}
-          theme="vs-dark"
-          loading="Loading..."
+          theme={isDark ? 'vs-dark' : 'light'}
           onChange={handleEditorChange}
+          loading={
+            <div className={`flex items-center justify-center h-full ${isDark ? 'text-white' : 'text-gray-900'}`}>
+              Loading...
+            </div>
+          }
           options={{
             minimap: { enabled: false },
             wordWrap: 'on',
-            fontSize: 14,
+            fontSize: fontSize,
             lineHeight: 24,
             padding: { top: 16, bottom: 16 },
             scrollBeyondLastLine: false,
@@ -87,9 +172,7 @@ const EditorPage = () => {
             cursorBlinking: 'smooth',
             cursorSmoothCaretAnimation: "on",
             automaticLayout: true,
-            bracketPairColorization: {
-              enabled: true,
-            },
+            bracketPairColorization: { enabled: true },
           }}
         />
       </div>
