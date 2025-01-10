@@ -5,13 +5,19 @@ import { Editor } from '@monaco-editor/react';
 import { ChevronDown, Download, Sun, Moon, Menu, X, Languages, ZoomIn, ZoomOut } from 'lucide-react';
 
 const EditorPage = () => {
-  const [content, setContent] = useState('');
+  const initialContent = `\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n`;
+  const [content, setContent] = useState(initialContent);
   const [isDark, setIsDark] = useState(true);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [filename, setFilename] = useState('document');
   const [selectedLanguage, setSelectedLanguage] = useState('text');
   const dropdownRef = useRef<any | null>(null);
   const [fontSize, setFontSize] = useState(16);
+  const editorRef = useRef(null);
+
+  const handleEditorDidMount = (editor: any) => {
+    editorRef.current = editor;
+  };
 
   const handleZoomIn = () => {
     setFontSize(prev => Math.min(prev + 4, 32)); // Max font size 24
@@ -120,7 +126,7 @@ const EditorPage = () => {
 
   return (
     <div className={`h-screen flex flex-col overflow-hidden ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
-      <div className={`p-2 flex items-center justify-between gap-2 ${isDark ? 'bg-gray-800' : 'bg-white border-b'}`}>
+      <div className={`px-2 pt-2 pb-0 flex items-center justify-between gap-2 ${isDark ? 'bg-gray-800' : 'bg-white border-b'}`}>
         <div className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
           <input
             type="text"
@@ -161,6 +167,7 @@ const EditorPage = () => {
               Loading...
             </div>
           }
+          onMount={handleEditorDidMount}
           options={{
             minimap: { enabled: false },
             wordWrap: 'on',
@@ -173,6 +180,39 @@ const EditorPage = () => {
             cursorSmoothCaretAnimation: "on",
             automaticLayout: true,
             bracketPairColorization: { enabled: true },
+            overviewRulerBorder: false,
+            selectionHighlight: true,
+            occurrencesHighlight: "off",
+            renderLineHighlight: 'none',
+            scrollbar: {
+              useShadows: false,
+              vertical: 'visible',
+              horizontal: 'visible',
+              verticalScrollbarSize: 12,
+              horizontalScrollbarSize: 12,
+              alwaysConsumeMouseWheel: false
+            },
+            // Touch settings
+            mouseWheelScrollSensitivity: 1.5,
+            fastScrollSensitivity: 7,
+            multiCursorModifier: 'alt',
+            wordBasedSuggestions: "off",
+            // Selection settings
+            selectionClipboard: true,
+            copyWithSyntaxHighlighting: true,
+            dragAndDrop: true,
+            // Performance settings
+            renderValidationDecorations: 'editable',
+            renderWhitespace: 'none',
+            renderControlCharacters: false,
+            // Additional features
+            links: true,
+            contextmenu: true, // Enable context menu for copy/paste
+            find: {
+              addExtraSpaceOnTop: false,
+              autoFindInSelection: 'never',
+              seedSearchStringFromSelection: 'never'
+            }
           }}
         />
       </div>
