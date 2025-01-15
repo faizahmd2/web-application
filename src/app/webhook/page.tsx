@@ -2,11 +2,14 @@
 
 import { nanoid } from 'nanoid';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function CreateWebhook() {
   const router = useRouter();
+  const [disabled, setDisabled] = useState(false);
   
   const createNewWebhook = () => {
+    setDisabled(true);
     const id = nanoid(10);
     router.push(`/webhook/${id}`);
   };
@@ -24,6 +27,7 @@ export default function CreateWebhook() {
         </div>
         <div className="mt-8">
           <button
+            disabled={disabled}
             onClick={createNewWebhook}
             className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >

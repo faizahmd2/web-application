@@ -14,7 +14,6 @@ export default function WebhookContent({ id } : { id: string }) {
 
   const fetchData = async () => {
     try {
-      console.log("Fetching data:", id);
       const response = await fetch(`/api/webhook/${id}`);
       if (!response.ok) throw new Error('Failed to fetch data');
       const json = await response.json();
@@ -28,9 +27,7 @@ export default function WebhookContent({ id } : { id: string }) {
   };
 
   useEffect(() => {
-    console.log("socket:", socket);
       if(socket) socket.on('code-update', (data: any) => {
-        console.log("Received webhook data:", data);
         fetchData();
       });
   }, [socket]);
