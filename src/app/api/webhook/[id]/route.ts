@@ -5,7 +5,7 @@ import axios from 'axios';
 const db = new DatabaseService();
 const COLLECTION_NAME = 'webhooks';
 
-export async function POST(
+async function handleRequest(
   request: Request,
   context: any
 ) {
@@ -13,21 +13,32 @@ export async function POST(
     const params = await context.params;
     const collection = await db.getCollection(COLLECTION_NAME);
     const { id } = params;
-    
-    const body = await request.json();
+
+    const method = request.method;
     const headers = Object.fromEntries(request.headers);
-    
+    const query = Object.fromEntries(new URL(request.url).searchParams);
+
+    let body: any = null;
+    if (['POST', 'PUT', 'PATCH'].includes(method)) {
+      try {
+        body = await request.json();
+      } catch (e) {
+        console.warn('No JSON body provided:', e);
+      }
+    }
+
     await collection.updateOne(
       { uniqueId: id },
       {
         $set: {
           lastRequest: {
+            method,
             body,
+            query,
             headers,
-            method: request.method,
-            timestamp: new Date()
-          }
-        }
+            timestamp: new Date(),
+          },
+        },
       },
       { upsert: true }
     );
@@ -41,25 +52,10 @@ export async function POST(
   }
 }
 
-export async function GET(
-  request: Request,
-  context: any
-) {
-  try {
-    const params = await context.params;
-    const id = params.id;
-    const collection = await db.getCollection(COLLECTION_NAME);
-    
-    const webhookData = await collection.findOne({ uniqueId: id });
-    
-    if (!webhookData) {
-        return NextResponse.json({webhookData: null});
-    //   return NextResponse.json({ error: 'Not found' }, { status: 404 });
-    }
-
-    return NextResponse.json(webhookData);
-  } catch (error) {
-    console.error('Webhook error:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-  }
-}
+export { handleRequest as GET };
+export { handleRequest as POST };
+export { handleRequest as PUT };
+export { handleRequest as DELETE };
+export { handleRequest as PATCH };
+// export { handleRequest as OPTIONS };
+// export { handleRequest as HEAD };

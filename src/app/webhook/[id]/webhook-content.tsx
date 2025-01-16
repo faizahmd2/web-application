@@ -14,7 +14,7 @@ export default function WebhookContent({ id } : { id: string }) {
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`/api/webhook/${id}`);
+      const response = await fetch(`/api/webhook/details/${id}`);
       if (!response.ok) throw new Error('Failed to fetch data');
       const json = await response.json();
       setData(json);
