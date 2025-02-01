@@ -21,7 +21,7 @@ const GalleryPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const { ref, inView } = useInView();
-  const [showUploaded, setShowUploaded] = useState(searchParams.get('showUpload') === "true");
+  const [showUploaded, setShowUploaded] = useState<string | null>(searchParams.get('showUpload'));
 
   const addQueryParam = (q: string, v: string) => {
     const params = new URLSearchParams(searchParams?.toString());
@@ -53,7 +53,7 @@ const GalleryPage = () => {
 
   const handleUploadToggle = (checked: boolean) => {
     addQueryParam("showUpload", checked.toString());
-    setShowUploaded(checked);
+    setShowUploaded(checked ? "1" : "0");
   };
 
   const {
@@ -68,7 +68,7 @@ const GalleryPage = () => {
     queryFn: async ({ pageParam = 1 }) => {
       const params = new URLSearchParams({
         page: pageParam.toString(),
-        showUpload: showUploaded.toString(),
+        showUpload: showUploaded && showUploaded.toString() === "1" ? "1" : "0",
         ...(debouncedQuery && { query: debouncedQuery })
       });
       
@@ -128,7 +128,7 @@ const GalleryPage = () => {
           <div className="flex items-center space-x-2 mt-3">
             <Checkbox 
               id="uploaded"
-              checked={showUploaded}
+              checked={showUploaded == "1"}
               onCheckedChange={handleUploadToggle}
               className="h-4 w-4"
             />

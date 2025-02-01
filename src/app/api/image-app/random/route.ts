@@ -8,7 +8,7 @@ export async function GET(request: Request) {
     const url = new URL(request.url, `http://localhost`);
     const searchParams = new URLSearchParams(url.search);
     const page = parseInt(searchParams.get('page') || '1', 10);
-    const showUpload = searchParams.get('showUpload') === "true";
+    const showUpload = searchParams.get('showUpload') == "1";
     const user = searchParams.get('user') || null;
     
     // Get client IP from headers
