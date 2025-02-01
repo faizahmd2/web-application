@@ -52,8 +52,9 @@ const GalleryPage = () => {
   };
 
   const handleUploadToggle = (checked: boolean) => {
-    addQueryParam("showUpload", checked.toString());
-    setShowUploaded(checked ? "1" : "0");
+    let v = checked ? "1" : "0";
+    addQueryParam("showUpload", v);
+    setShowUploaded(v);
   };
 
   const {
