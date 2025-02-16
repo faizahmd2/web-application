@@ -8,7 +8,7 @@ const dbService = new DatabaseService();
 
 // Common function to handle endpoint matching and parameter processing
 async function handleRequest(req: NextRequest, method: string) {
-  const fullPath = req.nextUrl.pathname.replace('/mock-api/', '');
+  const fullPath = req.nextUrl.pathname.replace('/mock-api', '');
   const searchParams = Object.fromEntries(req.nextUrl.searchParams);
   
   const collection = await dbService.getCollection('customApis');

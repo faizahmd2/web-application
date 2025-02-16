@@ -12,7 +12,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import DeleteConfirmationDialog from '@/components/ui/delete-popup';
-import { useToast } from "@/hooks/use-toast";
+import { Toaster, toast } from 'sonner'
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -130,7 +131,6 @@ const ParamConfig: React.FC<ParamConfigProps> = ({ params, setParams, label }) =
 
 const EndpointCard: React.FC<EndpointCardProps> = ({ endpoint, onDelete }) => {
   const [showDetails, setShowDetails] = useState(false);
-  const { toast }: any = useToast();
   const [deleteDialog, setDeleteDialog] = useState({
     isOpen: false,
     projectId: "",
@@ -147,7 +147,7 @@ const EndpointCard: React.FC<EndpointCardProps> = ({ endpoint, onDelete }) => {
 
   const generateCodeSnippet = (api: Endpoint, type: SnippetType): string => {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const endpoint = `${baseUrl}/mock-api/${api.path}`;
+    const endpoint = `${baseUrl}/mock-api${api.path}`;
   
     const snippets: Record<SnippetType, string> = {
       url: endpoint,
@@ -180,12 +180,9 @@ const EndpointCard: React.FC<EndpointCardProps> = ({ endpoint, onDelete }) => {
     return snippets[type] || '';
   };
 
-  const copyToClipboard = (text: string) => {
+  const copyToClipboard = (text: string, message: string) => {
     navigator.clipboard.writeText(text);
-    toast({
-      title: "URL Copied",
-      description: "ECopied Successfully",
-    });
+    toast.success(message || "Copied Successfully");
   };
 
   const handleDeleteClick = (api: Endpoint) => {
@@ -207,9 +204,12 @@ const EndpointCard: React.FC<EndpointCardProps> = ({ endpoint, onDelete }) => {
         throw new Error('Failed to delete project');
       }
 
+      onDelete(deleteDialog.projectId);
       setDeleteDialog({ isOpen: false, projectId: "", projectName: '' });
+      toast.success(`Endpont ${deleteDialog.projectName} Deleted!`);
     } catch (error) {
-      console.error('Error deleting project:', error);
+      // console.error('Error deleting project:', error);
+      toast.error("Error deleting endpoint");
       // You might want to show an error toast here
     } finally {
       setIsDeleting(false);
@@ -218,6 +218,7 @@ const EndpointCard: React.FC<EndpointCardProps> = ({ endpoint, onDelete }) => {
 
   return (
     <Card>
+      <Toaster />
       <CardHeader className="pb-3">
         <div className="flex justify-between">
           <div>
@@ -249,36 +250,36 @@ const EndpointCard: React.FC<EndpointCardProps> = ({ endpoint, onDelete }) => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-50">
                 <DropdownMenuItem 
-                  onClick={() => copyToClipboard(generateCodeSnippet(endpoint, 'url'))}
+                  onClick={() => copyToClipboard(generateCodeSnippet(endpoint, 'url'), "URL Copied Succesfully")}
                 >
                   Copy URL
                 </DropdownMenuItem>
                 <DropdownMenuItem 
-                  onClick={() => copyToClipboard(generateCodeSnippet(endpoint, 'curl'))}
+                  onClick={() => copyToClipboard(generateCodeSnippet(endpoint, 'curl'), "cURL Copied Succesfully")}
                 >
                   Copy cURL
                 </DropdownMenuItem>
                 <DropdownMenuItem 
-                  onClick={() => copyToClipboard(generateCodeSnippet(endpoint, 'nodejs'))}
+                  onClick={() => copyToClipboard(generateCodeSnippet(endpoint, 'nodejs'), "Axios request Copied Succesfully")}
                 >
                   Copy Node.js
                 </DropdownMenuItem>
                 <DropdownMenuItem 
-                  onClick={() => copyToClipboard(generateCodeSnippet(endpoint, 'fetch'))}
+                  onClick={() => copyToClipboard(generateCodeSnippet(endpoint, 'fetch'), "Fetch Request Copied Succesfully")}
                 >
                   Copy Fetch
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             {/* DELETE Logic */}
-            {/* <Button className="text-sm p-1 h-8 rounded-sm" onClick={() => handleDeleteClick(endpoint)}>delete</Button> */}
-            {/* <DeleteConfirmationDialog
+            <Button className="text-sm p-1 h-8 rounded-sm" onClick={() => handleDeleteClick(endpoint)}>delete</Button>
+            <DeleteConfirmationDialog
               isOpen={deleteDialog.isOpen}
               onClose={() => setDeleteDialog({ isOpen: false, projectId: '', projectName: '' })}
               onConfirm={handleDeleteConfirm}
               projectName={deleteDialog.projectName}
               isDeleting={isDeleting}
-            /> */}
+            />
           </div>
         </div>
       </CardHeader>
@@ -323,7 +324,6 @@ const Dashboard = () => {
     queryParams: [],
     expirationDays: 7
   });
-  const { toast } = useToast();
 
   const fetchEndpoints = async () => {
     setIsLoading(true);
@@ -333,18 +333,10 @@ const Dashboard = () => {
       if(Array.isArray(data)) {
         setEndpoints(data);
       } else {
-        toast({
-          title: "Error",
-          description: "Failed to fetch endpoints:"+data.error,
-          variant: "destructive"
-        });
+        toast.error("Failed to fetch endpoints:"+data.error);
       }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to fetch endpoints",
-        variant: "destructive"
-      });
+      toast.error("Failed to fetch endpoints");
     }
     setIsLoading(false);
   };
@@ -370,14 +362,6 @@ const Dashboard = () => {
     setFormData({ ...formData, path: path });
   }
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast({
-      title: "URL Copied",
-      description: "Copied Successfully",
-    });
-  };
-
   const createEndpoint = async () => {
     // console.log("CLICK CALLED",formData);
     setIsCreating(true);
@@ -389,26 +373,6 @@ const Dashboard = () => {
         } catch {
           throw new Error('Invalid JSON data');
         }
-      }
-
-      if(true) {
-        console.log("PARSED DATA:",{
-          ...formData,
-          responseData: parsedResponseData
-        });
-  
-        setShowCreateDialog(false);
-        fetchEndpoints();
-        setFormData({
-          path: '',
-          method: 'GET',
-          responseData: '',
-          template: '',
-          pathParams: [],
-          queryParams: [],
-          expirationDays: 7
-        });
-        return;
       }
       
       const response = await fetch('/api/endpoint/create', {
@@ -422,11 +386,9 @@ const Dashboard = () => {
 
       if (!response.ok) throw new Error('Failed to create endpoint');
 
-      toast({
-        title: "Success",
-        description: "Endpoint created successfully"
-      });
+      toast.success("Endpoint created successfully");
 
+      setUrlPreview('');
       setShowCreateDialog(false);
       fetchEndpoints();
       setFormData({
@@ -440,36 +402,13 @@ const Dashboard = () => {
       });
     } catch (error: any) {
       console.log("ERROR", error);
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive"
-      });
+      toast.error(error.message);
     }
     setIsCreating(false);
   };
 
   const deleteEndpoint = async (id: string) => {
-    try {
-      const response = await fetch(`/api/endpoint/delete/${id}`, {
-        method: 'DELETE'
-      });
-
-      if (!response.ok) throw new Error('Failed to delete endpoint');
-
-      toast({
-        title: "Success",
-        description: "Endpoint deleted successfully"
-      });
-
-      fetchEndpoints();
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to delete endpoint",
-        variant: "destructive"
-      });
-    }
+    fetchEndpoints();
   };
 
   return (
@@ -595,6 +534,7 @@ const Dashboard = () => {
         </div>
       </div>
 
+      <Toaster />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {endpoints.map((endpoint) => (
           <EndpointCard
