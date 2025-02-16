@@ -473,13 +473,13 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
+    <div className="container mx-auto p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div>
-          <h1 className="text-3xl font-bold">API Dashboard</h1>
-          <p className="text-muted-foreground mt-2">Manage your custom API endpoints</p>
+          <h1 className="text-2xl sm:text-3xl font-bold">API Dashboard</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">Manage your custom API endpoints</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
           <Button
             variant="outline"
             onClick={fetchEndpoints}
@@ -595,7 +595,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {endpoints.map((endpoint) => (
           <EndpointCard
             key={endpoint._id}
