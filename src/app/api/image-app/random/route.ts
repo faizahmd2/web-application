@@ -1,12 +1,11 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { UnsplashClient } from '../../../image-app/services/client';
 
 const client = new UnsplashClient();
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const url = new URL(request.url, `http://localhost`);
-    const searchParams = new URLSearchParams(url.search);
+    const searchParams = request.nextUrl.searchParams;
     const page = parseInt(searchParams.get('page') || '1', 10);
     const showUpload = searchParams.get('showUpload') == "1";
     const user = searchParams.get('user') || null;
