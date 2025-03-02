@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Viewer</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        #pdf-container {
+            width: 100%;
+            background-color: bisque;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        
+        .toolbar {
+            background-color: #f8f9fa;
+            padding: 0.5rem;
+            display: flex;
+            justify-content: center;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        button {
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            margin: 0 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+        
+        button:hover {
+            background-color: #34495e;
+        }
+        
+        #pdf-viewer {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+        
+        #page-num {
+            margin-right: 0.5rem;
+        }
+        
+        #page-count {
+            margin-left: 0.5rem;
+        }
+        
+        #loading {
+            text-align: center;
+            font-style: italic;
+            color: #6c757d;
+            padding: 2rem;
+        }
+        
+        canvas {
+            max-width: 100%;
+            height: auto !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            header {
+                padding: 0.8rem;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            button {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>My Professional Resume</h1>
+    </header>
+    
+    <div class="container">
+        <div id="pdf-container">
+            <div id="pdf-viewer">
+                <div id="loading">Loading document...</div>
+            </div>
+            <div class="toolbar">
+                <button id="prev">Previous</button>
+                <span id="page-info">
+                    <span id="page-num">1</span> / <span id="page-count">?</span>
+                </span>
+                <button id="next">Next</button>
+                <button id="download">Download PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script>
+        // The path to your PDF file
+        const pdfPath = "/site/pdf-files/resume.pdf";
+        
+        // Initialize PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+        
+        let pdfDoc = null,
+            pageNum = 1,
+            pageRendering = false,
+            pageNumPending = null,
+            scale = 1.5;
+            
+        const pdfViewer = document.getElementById('pdf-viewer'),
+              pageNumSpan = document.getElementById('page-num'),
+              pageCountSpan = document.getElementById('page-count'),
+              prevButton = document.getElementById('prev'),
+              nextButton = document.getElementById('next'),
+              downloadButton = document.getElementById('download');
+              
+        function renderPage(num) {
+            pageRendering = true;
+            
+            // Remove loading message if it exists
+            const loadingMsg = document.getElementById('loading');
+            if (loadingMsg) {
+                loadingMsg.remove();
+            }
+            
+            // Remove previous canvas if it exists
+            const canvas = pdfViewer.querySelector('canvas');
+            if (canvas) {
+                canvas.remove();
+            }
+            
+            // Create new canvas
+            const newCanvas = document.createElement('canvas');
+            pdfViewer.appendChild(newCanvas);
+            const ctx = newCanvas.getContext('2d');
+            
+            pdfDoc.getPage(num).then(function(page) {
+                const viewport = page.getViewport({scale: scale});
+                newCanvas.height = viewport.height;
+                newCanvas.width = viewport.width;
+                
+                const renderContext = {
+                    canvasContext: ctx,
+                    viewport: viewport
+                };
+                
+                const renderTask = page.render(renderContext);
+                
+                renderTask.promise.then(function() {
+                    pageRendering = false;
+                    if (pageNumPending !== null) {
+                        renderPage(pageNumPending);
+                        pageNumPending = null;
+                    }
+                });
+            });
+            
+            pageNumSpan.textContent = num;
+        }
+        
+        function queueRenderPage(num) {
+            if (pageRendering) {
+                pageNumPending = num;
+            } else {
+                renderPage(num);
+            }
+        }
+        
+        function onPrevPage() {
+            if (pageNum <= 1) {
+                return;
+            }
+            pageNum--;
+            queueRenderPage(pageNum);
+        }
+        
+        function onNextPage() {
+            if (pageNum >= pdfDoc.numPages) {
+                return;
+            }
+            pageNum++;
+            queueRenderPage(pageNum);
+        }
+        
+        function downloadPdf() {
+            const a = document.createElement('a');
+            a.href = pdfPath;
+            // a.download = pdfPath.split('/').pop();
+            a.download = "Resume_Md Faiz Ahmad.pdf";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+        
+        // Load the PDF
+        pdfjsLib.getDocument(pdfPath).promise.then(function(pdf) {
+            pdfDoc = pdf;
+            pageCountSpan.textContent = pdf.numPages;
+            renderPage(pageNum);
+            
+            prevButton.addEventListener('click', onPrevPage);
+            nextButton.addEventListener('click', onNextPage);
+            downloadButton.addEventListener('click', downloadPdf);
+        }).catch(function(error) {
+            const errorMessage = document.createElement('div');
+            errorMessage.textContent = 'Error loading PDF: ' + error.message;
+            errorMessage.style.color = 'red';
+            errorMessage.style.padding = '2rem';
+            errorMessage.style.textAlign = 'center';
+            pdfViewer.innerHTML = '';
+            pdfViewer.appendChild(errorMessage);
+            console.error(error);
+        });
+    </script>
+</body>
+</html>

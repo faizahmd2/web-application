@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" sizes="32x32" href="https://i.ibb.co/KFY0fY0/favicon-32x32.png">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/site/web-video-player/styles.css">
+    <title>Video Player</title>
+    <script src="/site/web-video-player/script.js" defer></script>
+</head>
+<body>
+    <div class="parent-container">
+        <input type="text" id="url-input" placeholder="Paste video URL here">
+        <div class="video-container paused" data-volume-level="high">
+            <div class="video-controls-container">
+                <div class="timeline-container">
+                    <div class="timeline">
+                        <div class="thumb-indicator"></div>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="play-pause-btn">
+                        <i class="fa-solid fa-play play-icon"></i>
+                        <i class="fa-solid fa-pause pause-icon"></i>
+                    </button>
+                    <div class="volume-container">
+                        <button class="mute-btn">
+                            <i class="fa-solid fa-volume-high volume-high"></i>
+                            <i class="fa-solid fa-volume-low volume-low"></i>
+                            <i class="fa-solid fa-volume-xmark volume-mute"></i>
+                        </button>
+                        <input class="volume-slider" type="range" min="0" max="1" step="any" value="1">
+                    </div>
+                    <div class="duration-container">
+                        <div class="current-time">0:00</div>
+                        /
+                        <div class="total-time">0:00</div>
+                    </div>
+                    <button class="speed-btn wide">
+                        1x
+                    </button>
+                    <button class="full-player-btn">
+                        <i class="fa-solid fa-expand full-screen-off"></i>
+                        <i class="fa-solid fa-compress full-screen-on"></i>
+                    </button>
+                </div>
+            </div>
+            <video id="custom-video">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+        <!-- <div id="drop-zone">
+            Drag and drop a video file here, or click to select
+        </div> -->
+        <div id="drop-zone">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <div id="drop-text">Drag and drop a video file here, or click to select</div>
+            <div id="file-name"></div>
+        </div>
+    </div>
+</body>
+</html>
