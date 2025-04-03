@@ -1,4 +1,3 @@
-import { format } from 'sql-formatter';
 import { parse } from 'jsonc-parser';
 import prettier from 'prettier/standalone';
 import parserBabel from 'prettier/parser-babel';
@@ -56,7 +55,7 @@ export const formatContent = async (content: string, type: ContentType): Promise
           singleQuote: true,
         });
       case 'sql':
-        return await format(content); // Await the SQL formatter
+        return formatSQL(content); // Await the SQL formatter
       case 'xml':
       case 'html':
         return prettier.format(content, {
@@ -77,3 +76,38 @@ export const formatContent = async (content: string, type: ContentType): Promise
         return content;
     }
 };
+
+function formatSQL(sql: string): string {
+  // Normalize whitespace first
+  let formattedSQL = sql.trim().replace(/\s+/g, ' ');
+  
+  // Define keywords that should trigger a new line before them
+  const newLineBeforeKeywords = [
+    'FROM', 'JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'INNER JOIN', 'OUTER JOIN', 'CROSS JOIN',
+    'WHERE', 'GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 'OFFSET',
+    'UNION', 'UNION ALL', 'INTERSECT', 'EXCEPT'
+  ];
+  
+  // Define keywords that should trigger a new line before them but with different handling
+  const conditionKeywords = ['AND', 'OR'];
+  
+  // Add new lines before main clauses
+  for (const keyword of newLineBeforeKeywords) {
+    const regex = new RegExp(`\\b${keyword}\\b`, 'gi');
+    formattedSQL = formattedSQL.replace(regex, `\n${keyword}`);
+  }
+  
+  // Handle AND, OR conditions with new lines
+  for (const keyword of conditionKeywords) {
+    const regex = new RegExp(`\\b${keyword}\\b`, 'gi');
+    formattedSQL = formattedSQL.replace(regex, `\n${keyword}`);
+  }
+  
+  // Handle ON conditions in JOIN clauses
+  formattedSQL = formattedSQL.replace(/\bON\b/gi, '\nON');
+  
+  // Clean up any accidentally created multiple new lines
+  formattedSQL = formattedSQL.replace(/\n\s+/g, '\n');
+  
+  return formattedSQL;
+}
