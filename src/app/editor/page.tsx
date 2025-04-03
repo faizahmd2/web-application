@@ -166,8 +166,8 @@ const EditorPage = () => {
       let hasValidExtention = languages.find(l => l.extension === fileNameArr[lastIdx]);
       let currentLanguage = languages.find(l => l.value === contentType);
       if (hasValidExtention) {
-        if(hasValidExtention.value !== currentLanguage?.value) {
-          fileNameArr[lastIdx] = currentLanguage!.extension;
+        if(currentLanguage && currentLanguage.value && currentLanguage.extension && hasValidExtention.value !== currentLanguage.value) {
+          fileNameArr[lastIdx] = currentLanguage.extension;
           fileName = fileNameArr.join(".");
         }
       } else {
